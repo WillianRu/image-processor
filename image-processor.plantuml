@@ -1,0 +1,51 @@
+@startuml
+
+!define ENTITY class
+!define SERVICE class
+!define VALUE_OBJECT class
+!define ADAPTER class
+
+package Dominio {
+    ENTITY Image {
+        - byte[] data
+        - ImageFormat format
+        + Image(byte[] data, ImageFormat format)
+    }
+
+    VALUE_OBJECT ImageFormat {
+        - String format
+        + ImageFormat(String format)
+        + static ImageFormat PNG()
+    }
+
+    SERVICE ImageConverterService {
+        + convertToPNG(Image image) : Image
+    }
+}
+
+package Aplicacion {
+    SERVICE ImageProcessingService {
+        - ImageConverterService imageConverter
+        + ImageProcessingService(ImageConverterService imageConverter)
+        + processImage(Image image) : Image
+    }
+}
+
+package Adaptadores {
+    ADAPTER HttpController {
+        - ImageProcessingService imageProcessingService
+        + HttpController(ImageProcessingService imageProcessingService)
+        + handleRequest(byte[] imageData)
+    }
+
+    ADAPTER ImageConverterServiceImpl implements ImageConverterService {
+        + convertToPNG(Image image) : Image
+    }
+}
+
+Dominio.Image  -->  Dominio.ImageFormat
+Aplicacion.ImageProcessingService  --> Dominio.ImageConverterService
+Adaptadores.HttpController  -->  Aplicacion.ImageProcessingService
+Adaptadores.ImageConverterServiceImpl  ..|> Dominio.ImageConverterService
+
+@enduml
