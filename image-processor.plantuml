@@ -1,33 +1,37 @@
 @startuml
 
 !define ENTITY class
-!define SERVICE class
+!define SERVICE interface
 !define VALUE_OBJECT class
 !define ADAPTER class
+!define APPLICATION_SERVICE class
 
 package Dominio {
     ENTITY Image {
         - byte[] data
         - ImageFormat format
-        + Image(byte[] data, ImageFormat format)
+        - String name
+        + Image(byte[] data, ImageFormat format, String name)
+        + changeFormat(ImageFormat newFormat)
     }
 
     VALUE_OBJECT ImageFormat {
         - String format
         + ImageFormat(String format)
-        + static ImageFormat PNG()
+        + static ImageFormat png()
+        + static ImageFormat jpeg()
     }
 
     SERVICE ImageConverterService {
-        + convertToPNG(Image image) : Image
+        + convertToFormat(Image image, ImageFormat targetFormat) : Image
     }
 }
 
 package Aplicacion {
-    SERVICE ImageProcessingService {
+    APPLICATION_SERVICE ImageProcessingService {
         - ImageConverterService imageConverter
         + ImageProcessingService(ImageConverterService imageConverter)
-        + processImage(Image image) : Image
+        + processImage(Image image, ImageFormat targetFormat) : Image
     }
 }
 
@@ -38,14 +42,14 @@ package Adaptadores {
         + handleRequest(byte[] imageData)
     }
 
-    ADAPTER ImageConverterServiceImpl implements ImageConverterService {
-        + convertToPNG(Image image) : Image
+    ADAPTER ImageConverterServiceImpl implements Dominio.ImageConverterService {
+        + convertToFormat(Image image, ImageFormat targetFormat) : Image
     }
 }
 
-Dominio.Image  -->  Dominio.ImageFormat
+Dominio.Image  --> Dominio.ImageFormat
 Aplicacion.ImageProcessingService  --> Dominio.ImageConverterService
 Adaptadores.HttpController  -->  Aplicacion.ImageProcessingService
-Adaptadores.ImageConverterServiceImpl  ..|> Dominio.ImageConverterService
+
 
 @enduml
