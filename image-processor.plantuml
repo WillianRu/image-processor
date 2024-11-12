@@ -6,7 +6,7 @@
 !define ADAPTER class
 !define APPLICATION_SERVICE class
 
-package Dominio {
+package Domain {
     ENTITY Image {
         - byte[] data
         - ImageFormat format
@@ -27,29 +27,29 @@ package Dominio {
     }
 }
 
-package Aplicacion {
+package Application {
     APPLICATION_SERVICE ImageProcessingService {
         - ImageConverterService imageConverter
         + ImageProcessingService(ImageConverterService imageConverter)
-        + processImage(Image image, ImageFormat targetFormat) : Image
+        + processImage(byte[] imageData, String targetFormat) : Image
     }
 }
 
-package Adaptadores {
+package Adapters {
     ADAPTER HttpController {
         - ImageProcessingService imageProcessingService
         + HttpController(ImageProcessingService imageProcessingService)
-        + handleRequest(byte[] imageData)
+        + convertImage(byte[] imageData, String targetFormat)
     }
 
-    ADAPTER ImageConverterServiceImpl implements Dominio.ImageConverterService {
+    ADAPTER ImageConverterServiceImpl implements Domain.ImageConverterService {
         + convertToFormat(Image image, ImageFormat targetFormat) : Image
     }
 }
 
-Dominio.Image  --> Dominio.ImageFormat
-Aplicacion.ImageProcessingService  --> Dominio.ImageConverterService
-Adaptadores.HttpController  -->  Aplicacion.ImageProcessingService
-
+Domain.Image  -->  Domain.ImageFormat
+Application.ImageProcessingService  -->  Domain.ImageConverterService
+Adapters.HttpController  -->  Application.ImageProcessingService
 
 @enduml
+
