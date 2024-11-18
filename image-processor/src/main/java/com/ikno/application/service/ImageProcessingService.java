@@ -1,13 +1,18 @@
 package com.ikno.application.service;
 
-import org.springframework.stereotype.Service;
 
 import com.ikno.domain.model.Image;
 import com.ikno.domain.model.ImageFormat;
 import com.ikno.domain.service.ImageConverterService;
 
-@Service
-public record ImageProcessingService(ImageConverterService imageConverter ) {
+
+public class ImageProcessingService {
+    private final ImageConverterService imageConverter;
+
+    public ImageProcessingService(ImageConverterService imageConverter) {
+        this.imageConverter = imageConverter;
+    }
+
     public Image processImage(byte[] imageData, String targetFormat) {
         ImageFormat format;
         if ("PNG".equalsIgnoreCase(targetFormat)) {
