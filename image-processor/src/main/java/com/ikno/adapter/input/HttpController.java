@@ -12,7 +12,13 @@ import com.ikno.domain.model.Image;
 
 @RestController
 @RequestMapping("/api/images")
-public record HttpController(ImageProcessingService imageProcessingService) {
+public class HttpController {
+    private final ImageProcessingService imageProcessingService;
+
+    public HttpController(ImageProcessingService imageProcessingService) {
+        this.imageProcessingService = imageProcessingService;
+    }
+
 
     @PostMapping("/convert")
     public ResponseEntity<?> convertImage(
